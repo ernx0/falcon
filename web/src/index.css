@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light theme — warm paper + ink + orange accent */
+  --bg: 250 248 244;
+  --panel: 244 241 233;
+  --panel2: 237 233 222;
+  --panel3: 226 222 209;
+  --ink: 24 24 27;
+  --subtle: 63 63 70;
+  --muted: 113 113 122;
+  --border: 212 208 196;
+  --border-soft: 230 226 215;
+  --dot: 196 194 184;
+  --accent: 234 88 12;
+  --accent-2: 194 65 12;
+  --success: 21 128 61;
+  --warn: 161 98 7;
+  --danger: 220 38 38;
+  --crit: 185 28 28;
+}
+
+.dark {
+  /* Dark theme — soft black + cream ink + orange accent */
+  --bg: 17 17 19;
+  --panel: 24 24 27;
+  --panel2: 32 32 36;
+  --panel3: 45 45 50;
+  --ink: 244 244 245;
+  --subtle: 200 200 205;
+  --muted: 161 161 170;
+  --border: 63 63 70;
+  --border-soft: 39 39 42;
+  --dot: 60 60 67;
+  --accent: 249 115 22;
+  --accent-2: 251 146 60;
+  --success: 74 222 128;
+  --warn: 251 191 36;
+  --danger: 248 113 113;
+  --crit: 244 63 94;
+}
+
+@layer base {
+  html, body, #root { height: 100%; }
+  html { background: rgb(var(--bg)); }
+  body {
+    background-color: rgb(var(--bg));
+    color: rgb(var(--ink));
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02','cv03','cv04','cv11';
+  }
+  * { box-sizing: border-box; }
+  ::selection { background: rgb(var(--accent)); color: rgb(var(--bg)); }
+
+  h1, h2, h3, h4 {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.015em;
+    font-weight: 700;
+    color: rgb(var(--ink));
+  }
+  h1 { font-size: 1.875rem; line-height: 1.15; }
+  h2 { font-size: 1.375rem; line-height: 1.2; }
+  h3 { font-size: 1.125rem; line-height: 1.3; font-weight: 600; }
+
+  code, pre, .font-mono { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+}
+
+@layer components {
+  .input {
+    @apply w-full bg-bg border border-border text-ink placeholder-muted
+           px-3 py-2 text-sm rounded-md
+           transition-colors duration-100
+           focus:outline-none focus:border-ink focus:ring-1 focus:ring-ink/20;
+  }
+  textarea.input {
+    @apply font-mono text-[13px] leading-relaxed min-h-[140px];
+  }
+  select.input {
+    @apply pr-8 appearance-none bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+    background-size: 12px;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           px-3.5 py-2 text-[13px] font-medium
+           border border-border rounded-md transition-colors duration-100
+           focus:outline-none focus:ring-2 focus:ring-accent/30 select-none
+           disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-bg border-ink hover:bg-accent hover:border-accent;
+  }
+  .btn-secondary {
+    @apply btn bg-bg text-ink hover:bg-panel2;
+  }
+  .btn-accent {
+    @apply btn bg-accent text-bg border-accent hover:bg-accent-2 hover:border-accent-2;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent border-transparent text-subtle hover:bg-panel2 hover:text-ink;
+  }
+  .btn-danger {
+    @apply btn bg-bg text-danger border-danger/60 hover:bg-danger hover:text-bg hover:border-danger;
+  }
+  .btn-sm { @apply px-2.5 py-1 text-xs gap-1.5; }
+
+  .card {
+    @apply bg-bg border border-border rounded-lg;
+  }
+  .card-shadow {
+    @apply card shadow-sm;
+  }
+  .card-hover {
+    @apply card transition-colors duration-100 hover:bg-panel;
+  }
+  .card-header {
+    @apply px-4 py-2.5 border-b border-border bg-panel/60 flex items-center justify-between rounded-t-lg;
+  }
+  .card-header-title {
+    @apply text-sm font-semibold text-ink;
+  }
+  .card-header-meta {
+    @apply text-xs text-muted font-medium;
+  }
+
+  .table-wrap {
+    @apply overflow-x-auto scroll-thin;
+  }
+  .table-wrap > table { @apply min-w-full; }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5
+           text-[11px] font-semibold uppercase tracking-wide
+           border border-border rounded-md;
+  }
+
+  .label {
+    @apply text-xs font-medium text-muted;
+  }
+
+  .table-base { @apply w-full text-sm; }
+  .table-base thead th {
+    @apply text-left text-[11px] font-semibold uppercase tracking-wide text-muted
+           py-2 px-3 border-b border-border bg-panel/60;
+  }
+  .table-base tbody tr {
+    @apply border-b border-border-soft transition-colors hover:bg-panel2/60;
+  }
+  .table-base tbody td {
+    @apply py-2 px-3 align-middle;
+  }
+  .table-base tbody tr:last-child { @apply border-b-0; }
+
+  .skeleton {
+    @apply rounded-md border border-border-soft bg-gradient-to-r from-panel via-panel3 to-panel bg-[length:400px_100%] animate-shimmer;
+  }
+
+  .section-tag {
+    @apply text-[11px] font-semibold uppercase tracking-wide text-muted;
+  }
+
+  .kbd {
+    @apply inline-flex items-center px-1.5 py-0.5 text-[11px] font-mono
+           border border-border rounded bg-panel text-subtle;
+  }
+
+  /* Minimal markdown preview styles — opt-in (.prose-md) so we don't
+     leak heading/list spacing onto every page that happens to render
+     a <h2> from a third-party block. */
+  .prose-md h1 { @apply text-2xl font-bold tracking-tight mt-4 mb-2; }
+  .prose-md h2 { @apply text-xl  font-bold tracking-tight mt-4 mb-2 pb-1 border-b border-border-soft; }
+  .prose-md h3 { @apply text-lg  font-semibold mt-3 mb-1.5; }
+  .prose-md h4 { @apply text-base font-semibold mt-3 mb-1.5; }
+  .prose-md p  { @apply my-2; }
+  .prose-md ul { @apply list-disc pl-5 my-2 space-y-0.5; }
+  .prose-md ol { @apply list-decimal pl-5 my-2 space-y-0.5; }
+  .prose-md li { @apply leading-snug; }
+  .prose-md a  { @apply text-accent hover:underline; }
+  .prose-md strong { @apply font-semibold text-ink; }
+  .prose-md em { @apply italic; }
+  .prose-md code {
+    @apply px-1 py-0.5 rounded bg-panel2 text-ink font-mono text-[12px];
+  }
+  .prose-md pre {
+    @apply my-3 p-3 rounded-md bg-ink text-bg font-mono text-xs overflow-auto scroll-thin;
+  }
+  .prose-md pre code { @apply bg-transparent text-bg p-0; }
+  .prose-md blockquote {
+    @apply my-2 pl-3 border-l-2 border-border-soft text-muted;
+  }
+  .prose-md hr { @apply my-4 border-border-soft; }
+  .prose-md table { @apply my-3 border border-border-soft text-sm w-full; }
+  .prose-md th, .prose-md td { @apply px-2 py-1 border border-border-soft; }
+  .prose-md th { @apply bg-panel/40 font-semibold; }
+  .prose-md img { @apply max-w-full rounded; }
+}
+
+@layer utilities {
+  .scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll-thin::-webkit-scrollbar-track { background: transparent; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: rgb(var(--border)); border-radius: 4px; }
+  .scroll-thin::-webkit-scrollbar-thumb:hover { background: rgb(var(--muted)); }
+  .tabular { font-variant-numeric: tabular-nums; }
+  .dot-bg {
+    background-image: radial-gradient(circle, rgb(var(--dot)) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .text-balance { text-wrap: balance; }
+}
+
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: rgb(var(--bg)); }
+::-webkit-scrollbar-thumb { background: rgb(var(--border)); border: 3px solid rgb(var(--bg)); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(var(--muted)); }
+::-webkit-scrollbar-corner { background: rgb(var(--bg)); }

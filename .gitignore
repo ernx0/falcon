@@ -1,0 +1,15 @@
+.env
+*.log
+data/
+.data/
+node_modules/
+dist/
+build/
+.DS_Store
+api/bin/
+api/api
+worker/bin/
+worker/worker
+web/dist/
+*.test
+coverage.out

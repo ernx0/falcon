@@ -1,0 +1,1215 @@
+basePath: /
+definitions:
+  github_com_erhan_falcon_api_internal_models.Host:
+    properties:
+      first_seen_at:
+        type: string
+      id:
+        type: integer
+      last_seen_at:
+        type: string
+      meta:
+        items:
+          type: integer
+        type: array
+      out_of_scope:
+        type: boolean
+      program_id:
+        type: integer
+      scope_id:
+        $ref: '#/definitions/sql.NullInt64'
+      value:
+        type: string
+    type: object
+  github_com_erhan_falcon_api_internal_models.OutOfScope:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      kind:
+        type: string
+      pattern:
+        type: string
+      program_id:
+        type: integer
+      source_url:
+        type: string
+    type: object
+  github_com_erhan_falcon_api_internal_models.Program:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      icon_url:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      platform:
+        type: string
+      rules:
+        type: string
+      slug:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  github_com_erhan_falcon_api_internal_models.Report:
+    properties:
+      created_at:
+        type: string
+      cvss:
+        type: string
+      description_md:
+        type: string
+      endpoint_id:
+        $ref: '#/definitions/sql.NullInt64'
+      external_url:
+        type: string
+      host_id:
+        $ref: '#/definitions/sql.NullInt64'
+      id:
+        type: integer
+      poc:
+        type: string
+      program_id:
+        type: integer
+      reward_amount:
+        $ref: '#/definitions/sql.NullFloat64'
+      reward_currency:
+        type: string
+      service_id:
+        $ref: '#/definitions/sql.NullInt64'
+      severity:
+        type: string
+      status:
+        type: string
+      target:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      url:
+        type: string
+      vrt:
+        type: string
+    type: object
+  github_com_erhan_falcon_api_internal_models.ScopeItemJSON:
+    properties:
+      created_at:
+        type: string
+      enabled:
+        type: boolean
+      id:
+        type: integer
+      kind:
+        type: string
+      last_run_at:
+        type: string
+      next_run_at:
+        type: string
+      program_id:
+        type: integer
+      schedule_cron:
+        type: string
+      source_url:
+        type: string
+      value:
+        type: string
+    type: object
+  github_com_erhan_falcon_api_internal_models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+    type: object
+  internal_handlers.errorResp:
+    properties:
+      error:
+        type: string
+    type: object
+  internal_handlers.loginReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  internal_handlers.loginResp:
+    properties:
+      expires_at:
+        type: string
+      token:
+        type: string
+      user:
+        properties:
+          email:
+            type: string
+          id:
+            type: integer
+        type: object
+    type: object
+  internal_handlers.oosReq:
+    properties:
+      kind:
+        description: exact|wildcard|regex
+        type: string
+      pattern:
+        type: string
+    type: object
+  internal_handlers.pageResp:
+    properties:
+      items:
+        items: {}
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  internal_handlers.programReq:
+    properties:
+      description:
+        type: string
+      icon_url:
+        type: string
+      name:
+        type: string
+      platform:
+        type: string
+      rules:
+        type: string
+      slug:
+        type: string
+    type: object
+  internal_handlers.reportReq:
+    properties:
+      cvss:
+        type: string
+      description_md:
+        type: string
+      endpoint_id:
+        type: integer
+      external_url:
+        type: string
+      host_id:
+        type: integer
+      poc:
+        type: string
+      reward_amount:
+        type: number
+      reward_currency:
+        type: string
+      service_id:
+        type: integer
+      status:
+        type: string
+      target:
+        type: string
+      title:
+        type: string
+      url:
+        type: string
+      vrt:
+        type: string
+    type: object
+  internal_handlers.runStartResp:
+    properties:
+      run_id:
+        type: integer
+      status:
+        type: string
+    type: object
+  internal_handlers.scopeReq:
+    properties:
+      enabled:
+        type: boolean
+      kind:
+        description: domain|wildcard|ip|cidr
+        type: string
+      schedule_cron:
+        type: string
+      value:
+        type: string
+    type: object
+  sql.NullFloat64:
+    properties:
+      float64:
+        format: float64
+        type: number
+      valid:
+        description: Valid is true if Float64 is not NULL
+        type: boolean
+    type: object
+  sql.NullInt64:
+    properties:
+      int64:
+        format: int64
+        type: integer
+      valid:
+        description: Valid is true if Int64 is not NULL
+        type: boolean
+    type: object
+info:
+  contact: {}
+  description: Bug bounty & continuous recon backend.
+  title: Falcon API
+  version: 0.1.0
+paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.loginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.loginResp'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      summary: Sign in with email + password
+      tags:
+      - auth
+  /api/auth/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /api/import/bugcrowd:
+    post:
+      consumes:
+      - text/plain
+      parameters:
+      - description: raw HTML
+        in: body
+        name: body
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.Program'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Import Bugcrowd program from HTML
+      tags:
+      - programs
+  /api/oos/{id}:
+    delete:
+      parameters:
+      - description: rule id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Delete out-of-scope rule
+      tags:
+      - oos
+  /api/programs:
+    get:
+      parameters:
+      - description: page (1-based)
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.pageResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: List programs
+      tags:
+      - programs
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: program body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.programReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.Program'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Create program
+      tags:
+      - programs
+  /api/programs/{id}:
+    delete:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Delete program
+      tags:
+      - programs
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.Program'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Get program
+      tags:
+      - programs
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.programReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.Program'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Update program
+      tags:
+      - programs
+  /api/programs/{id}/endpoints:
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: fuzzy match on URL
+        in: query
+        name: q
+        type: string
+      - description: include out-of-scope
+        in: query
+        name: oos
+        type: boolean
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.pageResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: List endpoints
+      tags:
+      - assets
+  /api/programs/{id}/hosts:
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: fuzzy match on host value
+        in: query
+        name: q
+        type: string
+      - description: include out-of-scope hosts
+        in: query
+        name: oos
+        type: boolean
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.pageResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: List hosts
+      tags:
+      - assets
+  /api/programs/{id}/hosts/{hostId}:
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: host id
+        in: path
+        name: hostId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Get host detail (with services & endpoints)
+      tags:
+      - assets
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: host id
+        in: path
+        name: hostId
+        required: true
+        type: integer
+      - description: '{\'
+        in: body
+        name: body
+        required: true
+        schema:
+          additionalProperties:
+            type: boolean
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.Host'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Update host (toggle out_of_scope)
+      tags:
+      - assets
+  /api/programs/{id}/oos:
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.pageResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: List out-of-scope rules
+      tags:
+      - oos
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: rule body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.oosReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.OutOfScope'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Add out-of-scope rule
+      tags:
+      - oos
+  /api/programs/{id}/reports:
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.pageResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: List reports
+      tags:
+      - reports
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: report body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.reportReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.Report'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Create report
+      tags:
+      - reports
+  /api/programs/{id}/runs:
+    delete:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Delete all runs for a program
+      tags:
+      - runs
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.pageResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: List runs
+      tags:
+      - runs
+  /api/programs/{id}/scope:
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: scannable | all
+        in: query
+        name: scope
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.pageResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: List scope items
+      tags:
+      - scope
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: scope item body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.scopeReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.ScopeItemJSON'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Create scope item
+      tags:
+      - scope
+  /api/programs/{id}/scope/run-all:
+    post:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Trigger pipeline for every scope item in a program
+      tags:
+      - scope
+  /api/programs/{id}/services:
+    get:
+      parameters:
+      - description: program id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: include out-of-scope
+        in: query
+        name: oos
+        type: boolean
+      - description: page
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_handlers.pageResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: List services
+      tags:
+      - assets
+  /api/reports/{id}:
+    delete:
+      parameters:
+      - description: report id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Delete report
+      tags:
+      - reports
+    get:
+      parameters:
+      - description: report id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.Report'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Get report
+      tags:
+      - reports
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: report id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: fields
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.reportReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.Report'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Update report
+      tags:
+      - reports
+  /api/runs/{id}:
+    delete:
+      parameters:
+      - description: run id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Delete run
+      tags:
+      - runs
+    get:
+      parameters:
+      - description: run id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Get run with steps
+      tags:
+      - runs
+  /api/scope/{id}:
+    delete:
+      parameters:
+      - description: scope item id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Delete scope item
+      tags:
+      - scope
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: scope item id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: fields
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/internal_handlers.scopeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_erhan_falcon_api_internal_models.ScopeItemJSON'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Update scope item
+      tags:
+      - scope
+  /api/scope/{id}/run:
+    post:
+      parameters:
+      - description: scope item id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/internal_handlers.runStartResp'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Trigger pipeline run
+      tags:
+      - scope
+  /api/search:
+    get:
+      parameters:
+      - description: query string (min 2 chars)
+        in: query
+        name: q
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Global search
+      tags:
+      - assets
+  /api/vrt:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get Bugcrowd VRT taxonomy
+      tags:
+      - vrt
+  /api/vrt/refresh:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/internal_handlers.errorResp'
+      security:
+      - BearerAuth: []
+      summary: Refresh VRT from upstream
+      tags:
+      - vrt
+securityDefinitions:
+  BearerAuth:
+    description: 'JWT token issued by /api/auth/login. Format: "Bearer {token}".'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
