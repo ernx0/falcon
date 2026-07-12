@@ -17,7 +17,7 @@ type programReq struct {
 	Description string  `json:"description"`
 	Rules       *string `json:"rules"`
 	IconURL     *string `json:"icon_url"`
-	Platform    string  `json:"platform"`
+	PlatformURL string  `json:"platform_url"`
 }
 
 // List returns a page of programs with target / open-finding counts.
@@ -85,8 +85,8 @@ func (h *ProgramsHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	var p models.Program
 	err := h.DB.GetContext(r.Context(), &p, `
-INSERT INTO programs(name,slug,description,platform,icon_url) VALUES($1,$2,$3,$4,$5)
-RETURNING *`, req.Name, req.Slug, req.Description, req.Platform, icon)
+INSERT INTO programs(name,slug,description,platform_url,icon_url) VALUES($1,$2,$3,$4,$5)
+RETURNING *`, req.Name, req.Slug, req.Description, req.PlatformURL, icon)
 	if err != nil {
 		writeErr(w, http.StatusBadRequest, err.Error())
 		return
@@ -148,9 +148,9 @@ UPDATE programs SET
   description=$3,
   rules=COALESCE($4, rules),
   icon_url=COALESCE($5, icon_url),
-  platform=$6,
+  platform_url=$6,
   updated_at=NOW()
-WHERE id=$1 RETURNING *`, id, req.Name, req.Description, req.Rules, req.IconURL, req.Platform)
+WHERE id=$1 RETURNING *`, id, req.Name, req.Description, req.Rules, req.IconURL, req.PlatformURL)
 	if err != nil {
 		writeErr(w, http.StatusNotFound, "not found")
 		return

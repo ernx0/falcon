@@ -62,7 +62,16 @@ export function ProgramDetail() {
         </span>
         {p && (
           <>
-            <span className="badge bg-panel/60 text-subtle border-border-soft shrink-0">{p.platform || "private"}</span>
+            {p.platform_url ? (
+              <a
+                href={p.platform_url}
+                target="_blank"
+                rel="noreferrer"
+                className="badge bg-panel/60 text-subtle border-border-soft shrink-0 hover:text-accent"
+              >
+                Platform ↗
+              </a>
+            ) : null}
             <span className="text-muted font-mono text-xs truncate">{p.slug}</span>
           </>
         )}
@@ -107,7 +116,7 @@ function Overview({ p, loading }: { p: any; loading: boolean }) {
     if (p && form === null) {
       setForm({
         name: p.name || "",
-        platform: p.platform || "",
+        platform_url: p.platform_url || "",
         description: p.description || "",
         icon_url: p.icon_url || "",
       });
@@ -117,7 +126,7 @@ function Overview({ p, loading }: { p: any; loading: boolean }) {
   const save = useMutation({
     mutationFn: () => api.programUpdate(p.id, {
       name: form.name,
-      platform: form.platform,
+      platform_url: form.platform_url,
       description: form.description,
       icon_url: form.icon_url,
     }),
@@ -138,13 +147,13 @@ function Overview({ p, loading }: { p: any; loading: boolean }) {
 
   const dirty =
     form.name !== (p.name || "") ||
-    form.platform !== (p.platform || "") ||
+    form.platform_url !== (p.platform_url || "") ||
     form.description !== (p.description || "") ||
     form.icon_url !== (p.icon_url || "");
 
   const reset = () => setForm({
     name: p.name || "",
-    platform: p.platform || "",
+    platform_url: p.platform_url || "",
     description: p.description || "",
     icon_url: p.icon_url || "",
   });
@@ -163,8 +172,8 @@ function Overview({ p, loading }: { p: any; loading: boolean }) {
             <Field label="Name">
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Acme Inc" />
             </Field>
-            <Field label="Platform" hint="e.g. h1, bugcrowd, intigriti, private">
-              <Input value={form.platform} onChange={(e) => setForm({ ...form, platform: e.target.value })} placeholder="private" />
+            <Field label="Platform URL" hint="Link to the program page (e.g. HackerOne / Bugcrowd).">
+              <Input value={form.platform_url} onChange={(e) => setForm({ ...form, platform_url: e.target.value })} placeholder="https://hackerone.com/acme" />
             </Field>
           </div>
           <Field label="Icon URL" hint="Optional logo / image shown next to the program name.">
@@ -252,7 +261,7 @@ function Rules({ pid, program, loading }: { pid: number; program: any; loading: 
     mutationFn: () => api.programUpdate(pid, {
       name: program.name,
       description: program.description,
-      platform: program.platform,
+      platform_url: program.platform_url,
       rules: value ?? "",
     }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["program", pid] }),

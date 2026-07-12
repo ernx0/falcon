@@ -530,14 +530,14 @@ func (h *AssetsHandler) Search(w http.ResponseWriter, r *http.Request) {
 		ID          int64  `db:"id" json:"id"`
 		Name        string `db:"name" json:"name"`
 		Slug        string `db:"slug" json:"slug"`
-		Platform    string `db:"platform" json:"platform"`
+		PlatformURL string `db:"platform_url" json:"platform_url"`
 		Description string `db:"description" json:"description"`
 	}
 	programs := []programHit{}
 	// ILIKE catches substring hits ("phantom" → "Phantom"); trigram %
 	// catches typos / fuzzy matches. UNION dedupes by id.
 	_ = h.DB.SelectContext(r.Context(), &programs, `
-SELECT id, name, slug, platform, description FROM (
+SELECT id, name, slug, platform_url, description FROM (
   SELECT *, similarity(name, $1) AS sim FROM programs
   WHERE name ILIKE '%' || $1 || '%'
      OR slug ILIKE '%' || $1 || '%'

@@ -129,7 +129,7 @@ export function Search() {
                   key={`p-${p.id}`}
                   to={`/programs/${p.id}`}
                   primary={p.name}
-                  secondary={p.platform || "private"}
+                  secondary={p.platform_url || ""}
                   meta={p.slug}
                   badge={<span className="badge bg-panel/60 text-subtle border-border-soft">P-{String(p.id).padStart(3, "0")}</span>}
                 />

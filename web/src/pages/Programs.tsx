@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { api } from "../lib/api";
-import { Button, Card, CardHeader, Field, Input, Textarea, EmptyState, Skeleton, Icon, Pagination } from "../components/ui";
+import { Button, Card, CardHeader, Field, Input, EmptyState, Skeleton, Icon, Pagination } from "../components/ui";
 
 const PAGE_SIZE = 24;
 
@@ -11,9 +11,7 @@ export function Programs() {
   const [page, setPage] = useState(1);
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
-  const [platform, setPlatform] = useState("");
-  const [iconURL, setIconURL] = useState("");
+  const [platformURL, setPlatformURL] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["programs", page],
@@ -22,10 +20,10 @@ export function Programs() {
   });
 
   const create = useMutation({
-    mutationFn: () => api.programCreate({ name, description: desc, platform, icon_url: iconURL }),
+    mutationFn: () => api.programCreate({ name, platform_url: platformURL }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["programs"] });
-      setName(""); setDesc(""); setPlatform(""); setIconURL(""); setCreating(false);
+      setName(""); setPlatformURL(""); setCreating(false);
       setPage(1);
     },
   });
@@ -51,31 +49,10 @@ export function Programs() {
               <Field label="Name">
                 <Input placeholder="Acme Inc" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
               </Field>
-              <Field label="Platform" hint="e.g. h1, bugcrowd, intigriti, private">
-                <Input placeholder="private" value={platform} onChange={(e) => setPlatform(e.target.value)} />
+              <Field label="Platform URL" hint="Link to the program page (e.g. HackerOne / Bugcrowd).">
+                <Input placeholder="https://hackerone.com/acme" value={platformURL} onChange={(e) => setPlatformURL(e.target.value)} />
               </Field>
             </div>
-            <Field label="Icon URL" hint="Optional logo / image URL.">
-              <div className="flex gap-3 items-start">
-                <Input
-                  placeholder="https://example.com/logo.png"
-                  value={iconURL}
-                  onChange={(e) => setIconURL(e.target.value)}
-                  className="flex-1"
-                />
-                {iconURL && (
-                  <img
-                    src={iconURL}
-                    alt=""
-                    className="w-10 h-10 rounded-md border border-border-soft object-cover bg-panel/40 shrink-0"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                  />
-                )}
-              </div>
-            </Field>
-            <Field label="Description">
-              <Textarea placeholder="Short description, scope notes…" value={desc} onChange={(e) => setDesc(e.target.value)} />
-            </Field>
             <div className="flex gap-2 pt-3 border-t border-border">
               <Button variant="primary" onClick={() => create.mutate()} disabled={!name || create.isPending}>
                 {create.isPending ? "Creating…" : "Create program"}

@@ -93,7 +93,7 @@ type Program struct {
 	Description string    `db:"description" json:"description"`
 	Rules       string    `db:"rules" json:"rules"`
 	IconURL     string    `db:"icon_url" json:"icon_url"`
-	Platform    string    `db:"platform" json:"platform"`
+	PlatformURL string    `db:"platform_url" json:"platform_url"`
 	CreatedAt   time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt   time.Time `db:"updated_at" json:"updated_at"`
 }
