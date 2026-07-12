@@ -33,7 +33,8 @@ type scopeReq struct {
 }
 
 func detectKind(v string) string {
-	if strings.HasPrefix(v, "*.") {
+	// Any wildcard (classic "*." or label-inner "prod-*.") is a wildcard scope.
+	if strings.Contains(v, "*") {
 		return "wildcard"
 	}
 	if strings.Contains(v, "/") {

@@ -81,6 +81,20 @@ func (p *Pipeline) Run(ctx context.Context, j Job) (resultErr error) {
 		subs = append(subs, root)
 		subs = uniqueLower(subs)
 	}
+
+	// For a wildcard scope, keep only hosts that actually fall under the
+	// pattern. This matters for label-inner wildcards like
+	// "prod-*.nubank.com.br": subfinder enumerates the whole root
+	// (nubank.com.br), but only prod-*.nubank.com.br hosts are in scope.
+	if strings.Contains(j.ScopeVal, "*") {
+		kept := subs[:0]
+		for _, s := range subs {
+			if runner.WildcardMatch(s, j.ScopeVal) {
+				kept = append(kept, s)
+			}
+		}
+		subs = kept
+	}
 	in.Subdomains = subs
 
 	// DNS resolution. Captures A/AAAA/CNAME records for every subdomain —

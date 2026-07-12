@@ -4,13 +4,18 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tansta
 import { api, priorityFromSeverity } from "../lib/api";
 import { Button, Card, CardHeader, Field, Input, Select, Textarea, EmptyState, Skeleton, Icon, PriorityBadge, StatusBadge, Pagination } from "../components/ui";
 
-// Scope kinds the worker pipeline can scan. "" = auto-detect from the value.
+// Scope kinds. "" = auto-detect from the value. The domain-family kinds are
+// scanned by the worker; android/ios/desktop ride along for record-keeping
+// (the pipeline skips them).
 const SCOPE_KINDS = [
   { value: "", label: "Auto-detect" },
   { value: "domain", label: "Domain" },
   { value: "wildcard", label: "Wildcard" },
   { value: "ip", label: "IP" },
   { value: "cidr", label: "CIDR" },
+  { value: "android", label: "Android app" },
+  { value: "ios", label: "iOS app" },
+  { value: "desktop", label: "Desktop app" },
 ] as const;
 
 const tabs = ["overview", "rules", "scopes", "hosts", "reports", "runs"] as const;

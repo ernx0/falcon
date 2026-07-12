@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -111,13 +112,46 @@ func hostFromRawURL(raw string) string {
 	return ""
 }
 
-// rootDomain returns the bare domain from a wildcard target ("*.example.com" -> "example.com").
+// RootDomain returns the enumerable base domain for a scope value by dropping
+// any label that contains a wildcard. Handles both the classic full wildcard
+// ("*.example.com" -> "example.com") and label-inner wildcards
+// ("prod-*.nubank.com.br" -> "nubank.com.br"). Non-wildcard values pass
+// through unchanged.
 func RootDomain(v string) string {
 	v = strings.TrimSpace(v)
-	if strings.HasPrefix(v, "*.") {
-		return v[2:]
+	if !strings.Contains(v, "*") {
+		return v
 	}
-	return v
+	labels := strings.Split(v, ".")
+	kept := make([]string, 0, len(labels))
+	for _, l := range labels {
+		if strings.Contains(l, "*") {
+			continue
+		}
+		kept = append(kept, l)
+	}
+	return strings.Join(kept, ".")
+}
+
+// WildcardMatch reports whether host falls under a scope pattern.
+//   - no wildcard        -> exact match
+//   - "*.example.com"    -> example.com and any-depth subdomain
+//   - "prod-*.nubank.br" -> label-inner glob; "*" matches [a-z0-9-]* within a
+//     single label, the rest must match exactly ("prod-api.nubank.br" yes,
+//     "prod-api.x.nubank.br" and "api.nubank.br" no)
+func WildcardMatch(host, pattern string) bool {
+	host = strings.ToLower(strings.TrimSpace(host))
+	pattern = strings.ToLower(strings.TrimSpace(pattern))
+	if !strings.Contains(pattern, "*") {
+		return host == pattern
+	}
+	if strings.HasPrefix(pattern, "*.") {
+		base := pattern[2:]
+		return host == base || strings.HasSuffix(host, "."+base)
+	}
+	re := "^" + strings.ReplaceAll(regexp.QuoteMeta(pattern), `\*`, `[a-z0-9-]*`) + "$"
+	ok, _ := regexp.MatchString(re, host)
+	return ok
 }
 
 // dedupe normalizes and removes duplicate strings.
