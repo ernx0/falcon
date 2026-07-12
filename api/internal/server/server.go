@@ -52,7 +52,6 @@ func New(d Deps) http.Handler {
 	runH := &handlers.RunsHandler{DB: d.DB}
 	asH := &handlers.AssetsHandler{DB: d.DB, Cache: d.ScopeCache}
 	vrtH := &handlers.VRTHandler{}
-	impH := &handlers.ImportHandler{DB: d.DB}
 	intRunH := &handlers.InternalRunsHandler{DB: d.DB, ArtifactsDir: d.ArtifactsDir}
 
 	r.Route("/api", func(r chi.Router) {
@@ -101,8 +100,6 @@ func New(d Deps) http.Handler {
 			r.Get("/search", asH.Search)
 			r.Get("/vrt", vrtH.Get)
 			r.Post("/vrt/refresh", vrtH.Refresh)
-
-			r.Post("/import/bugcrowd", impH.ImportBugcrowd)
 
 			// Authenticated artifact serving so the run detail UI can fetch
 			// step output files (jsonl, txt, log) for inline preview.

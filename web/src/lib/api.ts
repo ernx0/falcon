@@ -66,26 +66,6 @@ export const api = {
     request<Page<any>>("GET", `/api/programs${pgQS(p)}`),
   programGet: (id: number) => request<any>("GET", `/api/programs/${id}`),
   programCreate: (b: any) => request<any>("POST", "/api/programs", b),
-  programImportBugcrowd: (htmlBody: string) => {
-    const tk = token();
-    const headers: Record<string, string> = { "Content-Type": "text/html" };
-    if (tk) headers["Authorization"] = `Bearer ${tk}`;
-    return fetch(API_URL + "/api/import/bugcrowd", {
-      method: "POST",
-      headers,
-      body: htmlBody,
-    }).then(async (r) => {
-      if (r.status === 401) {
-        setToken(null);
-        if (location.pathname !== "/login") location.href = "/login";
-      }
-      if (!r.ok) {
-        const text = await r.text().catch(() => r.statusText);
-        throw new ApiError(r.status, text);
-      }
-      return r.json() as Promise<any>;
-    });
-  },
   programUpdate: (id: number, b: any) => request<any>("PATCH", `/api/programs/${id}`, b),
   programDelete: (id: number) => request<void>("DELETE", `/api/programs/${id}`),
 

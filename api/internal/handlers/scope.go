@@ -42,6 +42,17 @@ func detectKind(v string) string {
 	return "domain"
 }
 
+// isScannableKind returns true for scope kinds the worker pipeline can
+// actually scan. Other kinds (ios/android/github/etc.) ride along in the
+// scope table for record-keeping but the scheduler & run-all skip them.
+func isScannableKind(kind string) bool {
+	switch strings.ToLower(strings.TrimSpace(kind)) {
+	case "domain", "wildcard", "ip", "cidr", "host", "":
+		return true
+	}
+	return false
+}
+
 // List paginates targets for a program. By default only returns scannable
 // rows (host/wildcard/CIDR/IP); pass scope=all to include descriptive
 // non-host items (mobile apps, repos, labels) — used by the Scope tab.

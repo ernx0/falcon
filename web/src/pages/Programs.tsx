@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { api } from "../lib/api";
 import { Button, Card, CardHeader, Field, Input, Textarea, EmptyState, Skeleton, Icon, Pagination } from "../components/ui";
@@ -8,16 +8,12 @@ const PAGE_SIZE = 24;
 
 export function Programs() {
   const qc = useQueryClient();
-  const nav = useNavigate();
   const [page, setPage] = useState(1);
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [platform, setPlatform] = useState("");
   const [iconURL, setIconURL] = useState("");
-  const [importing, setImporting] = useState(false);
-  const [importHTML, setImportHTML] = useState("");
-  const [importError, setImportError] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["programs", page],
@@ -34,106 +30,16 @@ export function Programs() {
     },
   });
 
-  const importBugcrowd = useMutation({
-    mutationFn: (htmlBody: string) => api.programImportBugcrowd(htmlBody),
-    onSuccess: (p) => {
-      qc.invalidateQueries({ queryKey: ["programs"] });
-      setImportError(null);
-      setImporting(false);
-      setImportHTML("");
-      nav(`/programs/${p.id}`);
-    },
-    onError: (err: any) => setImportError(err?.message || "Import failed"),
-  });
-
-  const submitImport = () => {
-    const html = importHTML.trim();
-    if (!html || importBugcrowd.isPending) return;
-    setImportError(null);
-    importBugcrowd.mutate(html);
-  };
-
   const programs = data?.items || [];
   const total = data?.total || 0;
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-end gap-2 flex-wrap">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            onClick={() => { setImporting(true); setImportError(null); }}
-            title="Paste a Bugcrowd program page HTML to import"
-          >
-            <Icon name="external" className="w-4 h-4" /> Import (Bugcrowd)
-          </Button>
-          <Button variant="primary" onClick={() => setCreating(true)}>
-            <Icon name="plus" className="w-4 h-4" /> New program
-          </Button>
-        </div>
+        <Button variant="primary" onClick={() => setCreating(true)}>
+          <Icon name="plus" className="w-4 h-4" /> New program
+        </Button>
       </div>
-
-      {importing && (
-        <Card shadow>
-          <CardHeader
-            title="Import from Bugcrowd"
-            meta="Paste the program page HTML below"
-            right={
-              <button
-                onClick={() => { setImporting(false); setImportHTML(""); setImportError(null); }}
-                className="text-xs text-muted hover:text-danger"
-              >
-                Close
-              </button>
-            }
-          />
-          <div className="p-5 space-y-3">
-            <Textarea
-              autoFocus
-              value={importHTML}
-              onChange={(e) => setImportHTML(e.target.value)}
-              onKeyDown={(e) => {
-                if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submitImport();
-              }}
-              placeholder="Open the Bugcrowd program page → View source (or DevTools → copy outer HTML) → paste here…"
-              className="min-h-[260px] font-mono text-xs"
-            />
-            <div className="flex items-center gap-2">
-              <Button
-                variant="primary"
-                onClick={submitImport}
-                disabled={!importHTML.trim() || importBugcrowd.isPending}
-              >
-                {importBugcrowd.isPending ? (
-                  <>
-                    <span className="w-3.5 h-3.5 border-2 border-bg border-t-transparent rounded-full animate-spin inline-block" />
-                    Importing…
-                  </>
-                ) : (
-                  <>
-                    <Icon name="save" className="w-4 h-4" /> Import
-                  </>
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => { setImporting(false); setImportHTML(""); setImportError(null); }}
-                disabled={importBugcrowd.isPending}
-              >
-                Cancel
-              </Button>
-              <span className="ml-auto text-xs text-muted">
-                {importHTML ? `${importHTML.length.toLocaleString()} chars` : "Cmd/Ctrl + Enter to submit"}
-              </span>
-            </div>
-            {importError && (
-              <div className="text-sm text-danger bg-danger/10 border border-danger/30 rounded-md px-3 py-2">
-                Import failed: {importError}
-              </div>
-            )}
-          </div>
-        </Card>
-      )}
 
       {creating && (
         <Card shadow>
