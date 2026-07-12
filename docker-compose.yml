@@ -57,31 +57,6 @@ services:
     ports:
       - "8090:8080"
 
-  worker:
-    build:
-      context: ./worker
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    depends_on:
-      redis:
-        condition: service_healthy
-      api:
-        condition: service_started
-    environment:
-      FALCON_REDIS_ADDR: redis:6379
-      FALCON_API_URL: http://api:8080
-      FALCON_WORKER_TOKEN: ${FALCON_WORKER_TOKEN:-worker-shared-secret}
-      FALCON_ARTIFACTS_DIR: /data/artifacts
-      FALCON_KATANA_DEPTH: ${FALCON_KATANA_DEPTH:-3}
-      FALCON_KATANA_CONCURRENCY: ${FALCON_KATANA_CONCURRENCY:-10}
-      FALCON_KATANA_PARALLELISM: ${FALCON_KATANA_PARALLELISM:-10}
-      FALCON_KATANA_RATE_LIMIT: ${FALCON_KATANA_RATE_LIMIT:-150}
-      FALCON_PW_MAX_HOSTS: ${FALCON_PW_MAX_HOSTS:-100}
-      FALCON_PW_MAX_PAGES_PER_HOST: ${FALCON_PW_MAX_PAGES_PER_HOST:-30}
-      FALCON_PW_PAGE_TIMEOUT_SECONDS: ${FALCON_PW_PAGE_TIMEOUT_SECONDS:-20}
-      FALCON_PW_INCLUDE_SUBDOMAINS: ${FALCON_PW_INCLUDE_SUBDOMAINS:-0}
-    volumes:
-      - ${FALCON_DATA_DIR:-./.data}/artifacts:/data/artifacts
 
   web:
     build:
