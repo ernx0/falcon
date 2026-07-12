@@ -2,7 +2,16 @@ import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { api, priorityFromSeverity } from "../lib/api";
-import { Button, Card, CardHeader, Field, Input, Textarea, EmptyState, Skeleton, Icon, PriorityBadge, StatusBadge, Pagination } from "../components/ui";
+import { Button, Card, CardHeader, Field, Input, Select, Textarea, EmptyState, Skeleton, Icon, PriorityBadge, StatusBadge, Pagination } from "../components/ui";
+
+// Scope kinds the worker pipeline can scan. "" = auto-detect from the value.
+const SCOPE_KINDS = [
+  { value: "", label: "Auto-detect" },
+  { value: "domain", label: "Domain" },
+  { value: "wildcard", label: "Wildcard" },
+  { value: "ip", label: "IP" },
+  { value: "cidr", label: "CIDR" },
+] as const;
 
 const tabs = ["overview", "rules", "scopes", "hosts", "reports", "runs"] as const;
 type Tab = typeof tabs[number];
@@ -316,6 +325,7 @@ function InScopePanel({ pid }: { pid: number }) {
   const PAGE_SIZE = 50;
   const [page, setPage] = useState(1);
   const [val, setVal] = useState("");
+  const [kind, setKind] = useState("");
   const [cron, setCron] = useState("");
 
   const [queueing, setQueueing] = useState<Set<number>>(new Set());
@@ -328,8 +338,8 @@ function InScopePanel({ pid }: { pid: number }) {
   });
 
   const create = useMutation({
-    mutationFn: () => api.scopeCreate(pid, { value: val, schedule_cron: cron || null }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["scope-items", pid] }); setVal(""); setCron(""); setPage(1); },
+    mutationFn: () => api.scopeCreate(pid, { value: val, kind: kind || undefined, schedule_cron: cron || null }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["scope-items", pid] }); setVal(""); setKind(""); setCron(""); setPage(1); },
   });
   const del = useMutation({
     mutationFn: (id: number) => api.scopeDelete(id),
@@ -428,14 +438,19 @@ function InScopePanel({ pid }: { pid: number }) {
           </span>
         }
       />
-      <div className="p-3 grid grid-cols-1 md:grid-cols-[1fr_180px_auto] gap-2 border-b border-border-soft">
+      <div className="p-3 grid grid-cols-1 md:grid-cols-[1fr_150px_180px_auto] gap-2 border-b border-border-soft">
         <Input
-          placeholder="example.com  ·  *.example.com  ·  iOS app  ·  github.com/org"
+          placeholder="example.com  ·  *.example.com  ·  10.0.0.0/24"
           value={val}
           onChange={(e) => setVal(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && val.trim()) create.mutate(); }}
           className="font-mono text-[13px]"
         />
+        <Select value={kind} onChange={(e) => setKind(e.target.value)} className="text-[13px]">
+          {SCOPE_KINDS.map((k) => (
+            <option key={k.value} value={k.value}>{k.label}</option>
+          ))}
+        </Select>
         <Input
           placeholder="cron (opt: 0 */6 * * *)"
           value={cron}
@@ -458,7 +473,7 @@ function InScopePanel({ pid }: { pid: number }) {
       {isLoading && !data ? (
         <div className="p-4 space-y-2"><Skeleton /><Skeleton /><Skeleton /></div>
       ) : items.length === 0 ? (
-        <EmptyState icon={<Icon name="target" className="w-7 h-7" />} title="No scope yet" hint="Add a domain, wildcard, mobile app or repo to begin." />
+        <EmptyState icon={<Icon name="target" className="w-7 h-7" />} title="No scope yet" hint="Add a domain, wildcard, IP or CIDR to begin." />
       ) : (
           <>
             <div className="table-wrap">
