@@ -1,0 +1,25 @@
+# Standalone worker deployment — scalable, connects to core's redis+api
+# over the VM's internal IP. Deploy separately in Coolify (watch: worker/**).
+services:
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      FALCON_REDIS_ADDR: ${FALCON_REDIS_ADDR:-10.10.10.3:6379}
+      FALCON_API_URL: ${FALCON_API_URL:-http://10.10.10.3:8090}
+      FALCON_WORKER_TOKEN: ${FALCON_WORKER_TOKEN:-worker-shared-secret}
+      FALCON_ARTIFACTS_DIR: /data/artifacts
+      FALCON_KATANA_DEPTH: ${FALCON_KATANA_DEPTH:-3}
+      FALCON_KATANA_CONCURRENCY: ${FALCON_KATANA_CONCURRENCY:-10}
+      FALCON_KATANA_PARALLELISM: ${FALCON_KATANA_PARALLELISM:-10}
+      FALCON_KATANA_RATE_LIMIT: ${FALCON_KATANA_RATE_LIMIT:-150}
+      FALCON_PW_MAX_HOSTS: ${FALCON_PW_MAX_HOSTS:-100}
+      FALCON_PW_MAX_PAGES_PER_HOST: ${FALCON_PW_MAX_PAGES_PER_HOST:-30}
+      FALCON_PW_PAGE_TIMEOUT_SECONDS: ${FALCON_PW_PAGE_TIMEOUT_SECONDS:-20}
+      FALCON_PW_INCLUDE_SUBDOMAINS: ${FALCON_PW_INCLUDE_SUBDOMAINS:-0}
+    volumes:
+      - falcon_artifacts:/data/artifacts
+volumes:
+  falcon_artifacts:
