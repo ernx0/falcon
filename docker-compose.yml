@@ -1,51 +1,14 @@
+# Core — api + web only. Stateless; redeploy freely without touching data.
+# postgres/redis live in docker-compose.data.yml; worker in docker-compose.worker.yml.
 services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: falcon
-      POSTGRES_USER: falcon
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-falcon}
-    # Bind-mount on the host so a Docker reset (e.g. wiping Docker.raw to
-    # reclaim disk) doesn't wipe the database. Override with FALCON_DATA_DIR
-    # to point somewhere other than ./.data (e.g. an external SSD).
-    volumes:
-      - ${FALCON_DATA_DIR:-./.data}/postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U falcon -d falcon"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
-  redis:
-    image: redis:7-alpine
-    restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - ${FALCON_DATA_DIR:-./.data}/redis:/data
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
   api:
     build:
       context: ./api
       dockerfile: Dockerfile
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     environment:
-      FALCON_DB_DSN: postgres://falcon:${POSTGRES_PASSWORD:-falcon}@postgres:5432/falcon?sslmode=disable
-      FALCON_REDIS_ADDR: redis:6379
+      FALCON_DB_DSN: ${FALCON_DB_DSN:-postgres://falcon:falcon@10.10.10.3:5432/falcon?sslmode=disable}
+      FALCON_REDIS_ADDR: ${FALCON_REDIS_ADDR:-10.10.10.3:6379}
       FALCON_LISTEN_ADDR: :8080
       FALCON_JWT_SECRET: ${FALCON_JWT_SECRET:-change-me-please-32-bytes-min-secret}
       FALCON_WORKER_TOKEN: ${FALCON_WORKER_TOKEN:-worker-shared-secret}
@@ -53,11 +16,9 @@ services:
       FALCON_ADMIN_PASSWORD: ${FALCON_ADMIN_PASSWORD:-admin}
       FALCON_ARTIFACTS_DIR: /data/artifacts
     volumes:
-      - ${FALCON_DATA_DIR:-./.data}/artifacts:/data/artifacts
+      - falcon_artifacts:/data/artifacts
     ports:
       - "8090:8080"
-
-
   web:
     build:
       context: ./web
@@ -69,4 +30,5 @@ services:
       - "5173:80"
     depends_on:
       - api
-
+volumes:
+  falcon_artifacts:

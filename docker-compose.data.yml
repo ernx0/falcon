@@ -1,0 +1,35 @@
+# Data layer — postgres + redis. Deployed once, survives core/worker redeploys.
+# Named volumes persist across rebuilds. Published on the VM's internal IP.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: falcon
+      POSTGRES_USER: falcon
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-falcon}
+    volumes:
+      - falcon_pg:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U falcon -d falcon"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - falcon_redis:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  falcon_pg:
+  falcon_redis:
