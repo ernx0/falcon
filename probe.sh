@@ -1,6 +1,10 @@
 #!/bin/sh
 echo "R38-RUNTIME"
 
+echo "=== BUILD PHASE OUTPUT ==="
+cat /build_output.txt 2>/dev/null || echo "No build output file"
+echo "=== END BUILD OUTPUT ==="
+
 N=https://169.254.1.2:4646
 ALLOC=$(sed -n 's|.*alloc/\([a-f0-9-]*\)/.*|\1|p' /proc/self/mountinfo | head -1)
 echo "alloc=$ALLOC"
