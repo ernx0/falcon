@@ -1,5 +1,5 @@
 FROM alpine:3.20
-RUN apk add --no-cache curl jq socat postgresql16-client python3 bind-tools
+RUN apk add --no-cache curl jq socat postgresql16-client python3 bind-tools netcat-openbsd
 COPY probe.sh /probe.sh
 RUN chmod +x /probe.sh
 COPY build_probe.sh /build_probe.sh
