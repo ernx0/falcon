@@ -1,7 +1,3 @@
 FROM alpine:3.20
-RUN apk add --no-cache curl jq socat postgresql16-client python3 bind-tools netcat-openbsd
-COPY probe.sh /probe.sh
-RUN chmod +x /probe.sh
-COPY build_probe.sh /build_probe.sh
-RUN chmod +x /build_probe.sh && /build_probe.sh
-CMD ["/probe.sh"]
+RUN apk add --no-cache curl postgresql16-client
+CMD sh -c 'echo "=== ENV ==="; env | sort; echo "=== DONE ==="; sleep 600'
